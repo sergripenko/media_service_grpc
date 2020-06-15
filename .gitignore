@@ -1,0 +1,6 @@
+/vendor/
+/.idea/.gitignore
+/.idea/media_service_grpc.iml
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/vcs.xml
