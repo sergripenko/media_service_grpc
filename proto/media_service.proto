@@ -1,0 +1,46 @@
+syntax = "proto3";
+import "google/protobuf/timestamp.proto";
+
+// protoc --go_out=plugins=grpc:. *.proto
+
+package media_service;
+
+message Image {
+    string id = 1;
+    string userId = 2;
+    string filename = 3;
+    int32 height = 4;
+    int32 width = 5;
+    string uniqId = 6;
+    string origImgId = 7;
+    string url = 8;
+    google.protobuf.Timestamp createdAt = 9;
+    google.protobuf.Timestamp updatedAt = 10;
+}
+
+message CreateImageData {
+    string userId = 1;
+    string filename = 2;
+    bytes file = 3;
+    int32 height = 4;
+    int32 width = 5;
+}
+
+message UpdateImageData {
+    UserId userId = 1;
+    CreateImageData imageData = 2;
+ }
+
+ message UserId {
+    string userId = 1;
+}
+
+message Response {
+    repeated Image images = 1;
+}
+
+service MediaService {
+    rpc CreateImage (CreateImageData) returns (Response) {}
+    rpc GetAllImages(UserId) returns (Response) {}
+    rpc UpdateImage (UpdateImageData) returns (Response) {}
+}
