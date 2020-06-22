@@ -27,7 +27,7 @@ message CreateImageData {
 }
 
 message UpdateImageData {
-    UserId userId = 1;
+    string imageId = 1;
     CreateImageData imageData = 2;
  }
 
