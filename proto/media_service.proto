@@ -1,5 +1,4 @@
 syntax = "proto3";
-import "google/protobuf/timestamp.proto";
 
 // protoc --go_out=plugins=grpc:. *.proto
 
@@ -14,8 +13,6 @@ message Image {
     string uniqId = 6;
     string origImgId = 7;
     string url = 8;
-    google.protobuf.Timestamp createdAt = 9;
-    google.protobuf.Timestamp updatedAt = 10;
 }
 
 message CreateImageData {
