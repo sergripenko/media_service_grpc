@@ -2,14 +2,15 @@ package main
 
 import (
 	"context"
-	"fmt"
-	"log"
-	media_service "media_service_grpc/proto"
+	"media_service_grpc/config"
+	ms "media_service_grpc/proto"
 	"net"
 	"time"
 
-	immongo "media_service_grpc/images/repository/mongo"
-	imuc "media_service_grpc/images/usecase"
+	"github.com/labstack/gommon/log"
+
+	imMongo "media_service_grpc/images/repository/mongo"
+	imUC "media_service_grpc/images/usecase"
 
 	"github.com/spf13/viper"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -19,39 +20,44 @@ import (
 )
 
 func main() {
+	if err := config.Init(); err != nil {
+		log.Error(err)
+	}
 	db := initDB()
-	imageRepo := immongo.NewImageRepository(db, viper.GetString("mongo.images_collection"))
-	imageUC := imuc.NewImageUseCase(imageRepo)
+	imageRepo := imMongo.NewImageRepository(db, viper.GetString("mongo.images_collection"))
+	imageUC := imUC.NewImageUseCase(imageRepo)
 
 	lis, err := net.Listen("tcp", ":8081")
 	if err != nil {
-		log.Fatalln("cant listet port", err)
+		log.Error("cant listet port", err)
 	}
-
 	server := grpc.NewServer()
-	media_service.RegisterMediaServiceServer(server, imageUC)
+	ms.RegisterMediaServiceServer(server, imageUC)
 
-	fmt.Println("starting server at :8081")
-	server.Serve(lis)
+	log.Info("starting server at :8081")
+
+	if err = server.Serve(lis); err != nil {
+		log.Error(err)
+	}
 }
 
 func initDB() *mongo.Database {
 	client, err := mongo.NewClient(options.Client().ApplyURI(viper.GetString("mongo.uri")))
 	if err != nil {
-		log.Fatalf("Error occured while establishing connection to mongoDB")
+		log.Error("Error occured while establishing connection to mongoDB")
+		return nil
 	}
-
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	err = client.Connect(ctx)
-	if err != nil {
-		log.Fatal(err)
+	if err = client.Connect(ctx); err != nil {
+		log.Error(err)
+		return nil
 	}
 
-	err = client.Ping(context.Background(), nil)
-	if err != nil {
-		log.Fatal(err)
+	if err = client.Ping(context.Background(), nil); err != nil {
+		log.Error(err)
+		return nil
 	}
 	return client.Database(viper.GetString("mongo.name"))
 }
