@@ -1,7 +1,6 @@
 bucket: "sergripenko-media-service"
 
 mongo:
-  uri: "mongodb://mongodb:27017"
+  uri: "mongodb://127.0.0.1:27017"
   name: "media_service"
-  users_collection: "users"
   images_collection: "images"
