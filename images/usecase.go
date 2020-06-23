@@ -6,7 +6,7 @@ import (
 )
 
 type UseCase interface {
-	CreateImage(context.Context, *mediaservice.CreateImageData) (*mediaservice.Response, error)
-	GetAllImages(context.Context, *mediaservice.UserId) (*mediaservice.Response, error)
-	UpdateImage(context.Context, *mediaservice.UpdateImageData) (*mediaservice.Response, error)
+	CreateImage(ctx context.Context, data *mediaservice.CreateImageData) (*mediaservice.Response, error)
+	GetAllImages(ctx context.Context, userId *mediaservice.UserId) (*mediaservice.Response, error)
+	UpdateImage(ctx context.Context, data *mediaservice.UpdateImageData) (*mediaservice.Response, error)
 }
