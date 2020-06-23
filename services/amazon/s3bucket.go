@@ -6,6 +6,8 @@ import (
 	"io"
 	"os"
 
+	"github.com/labstack/gommon/log"
+
 	"github.com/spf13/viper"
 
 	"github.com/aws/aws-sdk-go/aws/awserr"
@@ -14,14 +16,10 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws/credentials"
 
-	"github.com/astaxie/beego/logs"
-
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 )
-
-var bucketName = viper.GetString("bucket")
 
 const bucketImgPath = "/images/"
 
@@ -44,12 +42,12 @@ func SaveImageToS3(file io.Reader, filename string) (url string, err error) {
 
 	// Upload the file to S3.
 	result, err := uploader.Upload(&s3manager.UploadInput{
-		Bucket: aws.String(bucketName),
+		Bucket: aws.String(viper.GetString("bucket")),
 		Key:    aws.String(bucketImgPath + filename),
 		Body:   file,
 	})
 	if err != nil {
-		logs.Error(err)
+		log.Error(err)
 		return "", err
 	}
 	return result.Location, nil
@@ -65,7 +63,7 @@ func GetImageFromS3(file *os.File, filename string) (err error) {
 
 	// Write the contents of S3 Object to the file
 	_, err = downloader.Download(file, &s3.GetObjectInput{
-		Bucket: aws.String(bucketName),
+		Bucket: aws.String(viper.GetString("bucket")),
 		Key:    aws.String(bucketImgPath + filename),
 	})
 	if err != nil {
@@ -80,7 +78,7 @@ func DeleteImageFromS3(filename string) (err error) {
 	svc := s3.New(session.New(config))
 
 	input := &s3.DeleteObjectInput{
-		Bucket: aws.String(bucketName),
+		Bucket: aws.String(viper.GetString("bucket")),
 		Key:    aws.String(bucketImgPath + filename),
 	}
 
